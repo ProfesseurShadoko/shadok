@@ -152,7 +152,9 @@ ChiffreSolver([1,25,75,4,3,6],985).run()
 ***Shell***
 
 Very simplistic implementation of a shell that allows you to check if a word exists or to solve problems from *Des Chiffres et Des Lettres*
-
+```python
+import shadok.shell
+```
 ***
 
 And that's pretty much it ! For now at least 😏
