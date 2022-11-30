@@ -130,6 +130,31 @@ print(Admin.get(1))
 print(Admin.filter(Filter(lambda x:x.id<12,name="Professeur Shadoko"))[0])
 ```
 
+***
+***Des Chiffres et Des Lettres (French TV show)***
 
+Letters : the rules are the following. You are given a set of 10 letters, you must created the longest word possible with it.
+```python
+from shadok.dcdl import LetterSolver
+from shadok.dictionnary import Dcdl #official dictionnary of the games (some words are not allowed, conjugated verbs for exemple)
+
+LetterSolver("ceolclcnic",Dcdl()).run()
+```
+
+Numbers : the rules are the following. You are given a set of 6 numbers (integers from 1 to 10 plus 25,50,75 and 100) and using + - * / to combine the numbers you must find some target number
+```python
+from shadok.dcdl import ChiffreSolver
+
+ChiffreSolver([1,25,75,4,3,6],985).run()
+```
+***
+
+***Shell***
+
+Very simplistic implementation of a shell that allows you to check if a word exists or to solve problems from *Des Chiffres et Des Lettres*
+
+***
+
+And that's pretty much it ! For now at least 😏
 
     
