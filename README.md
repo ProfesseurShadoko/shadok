@@ -28,7 +28,7 @@ print(style("Some text"))
 ***Wrappers***<br>
 Implement Fibonacci :
 ```python
-from shadok.wrappes import memoize_me
+from shadok.wrappers import memoize_me
 
 @memoize_me
 def fib(n):
@@ -40,7 +40,7 @@ def fib(n):
 
 Time any function :
 ```python
-from shadok.wrappes import time_me
+from shadok.wrappers import time_me
 
 @time_me
 def test():
@@ -50,7 +50,7 @@ def test():
 
 Intercept everything a function has printed :
 ```python
-from shadok.wrappes import jam_me, JAMMER
+from shadok.wrappers import jam_me, JAMMER
 
 @jam_me
 def prints_stuff():
@@ -62,6 +62,73 @@ JAMMER.print() #prints stuff
 ```
 
 ***
+
+***Progress Bar***
+
+Trough an Iteration :
+```python
+from shadok.progress_bar import ProgressIterator
+from time import sleep
+
+for i in ProgressIterator(range(0,100)):
+  print(i)
+  sleep(0.1)
+```
+
+Trough a wrapper:
+```python
+from shadok.progress_bar import ProgressBar, task_me
+
+bar = ProgressBar(100)
+
+@task_me(bar,1)
+def wait():
+  sleep(0.1)
+
+for i in range(100):
+  wait()  
+```
+
+***
+
+***Dictionnary***
+```python
+from shadok.dictionnary import Wordle
+from shadok.style import OK,FAIL
+
+dico = Wordle()
+word = "apple"
+
+if dico[word]: #check weather the dictionnary contains a word
+  OK()
+else:
+  FAIL()
+```
+
+***
+***XLDB***
+
+Implementation of a Database and Model via an Excel Sheet (requires openpyxl, script tries to install it automatically at start)
+
+```python
+from shadok.XLDB import Database,Model,Filter
+
+class Admin(Model):
+  def __init__(self,name:str):
+    super().__init__()
+    self.name = name
+    
+  @staticmethod
+  def get_property_names() -> list:
+    return ["name"]
+ 
+Database.start()
+Admin.create()
+
+Admin("Professeur Shadoko").save()
+print(Admin.get(1))
+print(Admin.filter(Filter(lambda x:x.id<12,name="Professeur Shadoko"))[0])
+```
 
 
 
