@@ -126,17 +126,15 @@ class ChiffreSolver:
                          
     
 if __name__=="__main__":
-    """
     dico = Scrabble()
     solver = LetterSolver("abcdefghijklmnopqrstuvwxyz",dico)
-    solver.solve()
-    n = len(solver.best_words[0])
-    print(f"J'ai {n} lettres avec le(s) mot(s) :", *solver.best_words, sep=" ")
+    solver.run()
     #J'ai 14 lettres avec le(s) mot(s) : cryptogamiques stylographique xylographiques"""
     
+    """
     numbers=[8,25,50,75,8,8]
     target = 827
     solver = ChiffreSolver(numbers,target)
-    solver.run()
+    solver.run()"""
         
         

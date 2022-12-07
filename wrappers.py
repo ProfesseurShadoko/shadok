@@ -11,7 +11,13 @@ def time_me(func):
         #print function status
         str_args = ""
         for arg in args:
-            str_args+=f"{arg},"
+            arg_str = str(arg)
+            if len(arg_str)>20:
+                if hasattr(arg,"__len__"):
+                    arg_str = f"<{type(arg)} object of size {len(arg)}>"
+                else:
+                    arg_str = f"<{type(arg)} object>"
+            str_args+=f"{arg_str},"
         for kw in kwargs:
             str_args+=f"{kw}={kwargs[kw]},"
         print(f"You called : {func.__name__}({str_args[:-1]})")
@@ -33,7 +39,7 @@ def memoize_me(func):
     cache={}
     @wraps(func)
     def wrapper(*args,**kwargs):
-        key = str(*args)+str(**kwargs)
+        key = str(args)+str(kwargs)
         if not key in cache.keys():
             cache[key]=func(*args,**kwargs)
         return cache[key]

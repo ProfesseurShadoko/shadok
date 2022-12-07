@@ -163,7 +163,7 @@ class ChiffreShell(Shell):
             return ScrabbleShell().run()
         if command == "-l":
             return LetterShell().run()
-        if command == "-c":
+        if command == "-c" or command =="":
             target = int(input("Target : "))
             numbers = input("Numbers (separated by one space) : ")
             numbers = [int(number) for number in numbers.split(" ")]

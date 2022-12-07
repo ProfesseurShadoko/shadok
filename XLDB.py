@@ -336,7 +336,7 @@ class Exemple(Model):
 
 if __name__=="__main__":
     
-    restart=False
+    restart=True
     
     if restart:
         Database.reset()
