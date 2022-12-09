@@ -157,6 +157,39 @@ import shadok.shell
 ```
 ***
 
+***Memory***
+
+An easy way to save and load variable in python, using the pickle package.
+```python
+from shadok.memory import Memory
+
+class Pet:
+  def __init__(self,nane:str):
+    self.name = name
+
+dog = Pet("Snoopy")
+Memory().save(dog,"dog")
+
+dog = Memory().load("dog")
+print(dog.name)
+```
+
+***
+
+***Neural Network and Genetic Algorithm***
+
+Implementation of a Neural Network (set of layers (weights + bias + sigmoid function)) that has a 'split' function that allows him to have a child with a genetic mutation. Implementation of a Population that evolves tep by step (by only keeping the individuals that have been rewarded the most).
+
+```python
+from shadok.network import Layer, Network, Population
+import numpy as np
+
+population = Population(input_size=10,output_size=1,evolution_step=0.005,layer_structure=[5,3],population_size=100,discretize=1)
+
+```
+
+***
+
 And that's pretty much it ! For now at least 😏
 
     
