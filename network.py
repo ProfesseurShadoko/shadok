@@ -310,10 +310,10 @@ class Population:
         """
         self.individuals[individual][1]+=reward
     
-    def sort(self):
+    def sort(self)->None:
         self.individuals.sort(key = lambda x:-x[1])
     
-    def filter(self,best_pourcentage:float=0.10,target=""):
+    def filter(self,best_pourcentage:float=0.10,target="")->None:
         """keep best_pourcentage best and fill the rest with children of the bests
 
         Args:
@@ -324,7 +324,7 @@ class Population:
         to_keep = max(1,min(len(self.individuals),int(best_pourcentage*len(self.individuals))))
         new_pop = [[self.individuals[i][0],0] for i in range(to_keep)]
         for i in range(len(self.individuals)-to_keep):
-            to_clone = self.individuals[i%to_keep][0]
+            to_clone:Network = self.individuals[i%to_keep][0]
             new_pop.append([to_clone.split(self.step,target),0])
         self.individuals = new_pop
     
@@ -354,22 +354,16 @@ def demo(input_size):
     def run():
         population = Population(input_size,1,evolution_step=0.005,discretize=1)
         
-        for i in ProgressIterator(range(100)):
-            if i<20:
-                target=""
-            elif i<90:
-                target="matrix"
-            else:
-                target="bias"
+        for i in ProgressIterator(range(20)):
                 
             for j in range(len(population.individuals)):
                 population.reward(j,rate(population.network(j)))
             
                 
-            if i==99:
+            if i==19:
                 print(f"Average score of the population : {population.avg_score():.2f}%")
                 
-            population.filter(0.10,target)
+            population.filter(0.10)
         return population
     
     population = run()
@@ -380,17 +374,12 @@ def demo(input_size):
     
     Memory("network").save(population.individuals[0][0],f"model_for_{input_size}")
     
-    
-    
-    
 
 if __name__=="__main__":
     
     MODEL_SIZE = 10
-    
-    demo(MODEL_SIZE) #some models are currently loaded in memory !
-    
 
+    demo(MODEL_SIZE) #some models are currently loaded in memory !
     
     model = Memory("network").load(f"model_for_{MODEL_SIZE}")
     
