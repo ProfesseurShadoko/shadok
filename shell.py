@@ -3,6 +3,12 @@ from shadok.style import OK,FAIL,Style
 from shadok.dictionnary import Scrabble,Dcdl
 from shadok.dcdl import LetterSolver, ChiffreSolver
 
+
+dictionnaries = {
+    "dcdl":Dcdl(),
+    "scrabble":Scrabble(),
+}
+
 class ExitShell(Exception):
     def __init__(self):
         super().__init__("Exiting shell...")
@@ -88,8 +94,7 @@ class ScrabbleShell(Shell):
     
     def __init__(self):
         super().__init__("scrabble")
-        self.dico = Scrabble()
-    
+        self.dico = dictionnaries["scrabble"]
     def execute(self, command: str) -> None:
         if command == "-l":
             return LetterShell().run()
@@ -120,8 +125,8 @@ class LetterShell(Shell):
     
     def __init__(self):
         super().__init__("lettres")
-        self.dico = Dcdl()
-        self.scrabble = Scrabble()
+        self.dico = dictionnaries["dcdl"]
+        self.scrabble = dictionnaries["scrabble"]
     
     def execute(self, command: str) -> None:
         if command == "-s":
@@ -134,7 +139,7 @@ class LetterShell(Shell):
             if not command.isalpha():
                 return print(Style(text="red")("I am sorry, I don't know what you mean..."))
             else:
-                if self.dico[command]:
+                if self.scrabble[command]:
                     print(Style(text="green")(command)+" is valid")
                 else:
                     print(Style(text="red")(command)+" is invalid")
