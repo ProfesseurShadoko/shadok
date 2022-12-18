@@ -5,15 +5,11 @@ except:
     import os
     os.system("pip install numpy")
     import numpy as np
-
-
-from shadok.progress_bar import ProgressIterator
-from shadok.memory import Memory
-from shadok.style import Style
         
 
 
 class Layer:
+    """layer = matrix + bias + sigmoid function."""
     
     def __init__(self,input_size:int,output_size:int):
         self.input_size=input_size
@@ -176,67 +172,21 @@ class Network:
     def __iter__(self):
         return self.layers.__iter__()
     
-    def copy(self):
-        out = Network(self.input_size,self.output_size)
-        for layer in self:
-            out.add(layer.copy())
-        out.compile()
-        return out
-    
-    def split(self,mutation:float,target:str=""):
-        """Creates a child of the network by making a copy of it and creating random mutations
-
-        Args:
-            mutation (float): size of the mutation (random float between -mutation and +mutation will be added to weight)
-            target (str, optional): 'matrix' -> mutation to 1 element of each matrix of the layers / 'bias' -> same with bias / '' -> mutation to all the elements of the matrices. Defaults to "".
-
-        Returns:
-            Network: child
-        """
-        
-        if target=="":
-            child = self.copy()
-            
-            for layer in child.layers:
-                layer["matrix"]+=(np.random.rand(*layer["matrix"].shape)-0.5)*mutation*2
-                layer["bias"]+=(np.random.rand(*layer["bias"].shape)-0.5)*mutation*2
-                
-            return child
-        
-        if target=="matrix":
-            child = self.copy()
-            
-            for layer in child.layers:
-                i,j = layer["matrix"].shape
-                i = np.random.randint(i)
-                j = np.random.randint(j)
-                
-                layer[i,j]+=(np.random.rand()-0.5)*mutation       
-            return child
-        
-        if target=="bias":
-            child = self.copy()
-            
-            for layer in child.layers:
-                i = self.output_size
-                i = np.random.randint(i)                
-                layer[i]+=(np.random.rand()-0.5)*mutation       
-            return child
-        return self.copy()
-    
-    @staticmethod
-    def random(input_size:int,output_size:int,layer_sizes:list,discretize:int=1):
+    @classmethod
+    def random(cls:type,input_size:int,output_size:int,layer_sizes:list,discretize:int=1):
         """creates random network with given structure
 
         Args for exemple:
             input_size (int): 10
             output_size (int): 2
             layer_sizes (list): [5,3]
+        
+        discretize_output (int, optional): If discret = n, then output will be only numbers between 0 and n-1. discret = 0 means no discretization =>. Defaults to 1.
 
         Returns:
             Network: Layer(10-->5) Layer(5-->3) Layer(3-->2)
         """
-        network = Network(input_size,output_size,discretize)
+        network = cls(input_size,output_size,discretize)
         in_size = input_size
         
         for size in layer_sizes:
@@ -248,19 +198,21 @@ class Network:
         network.compile()
         return network
 
-    @staticmethod
-    def values(value:float,input_size:int,output_size:int,layer_sizes:list,discretize:int=1):
+    @classmethod
+    def values(cls:type,value:float,input_size:int,output_size:int,layer_sizes:list,discretize:int=1):
         """creates network with given structure, filled with unique value
 
         Args for exemple:
             input_size (int): 10
             output_size (int): 2
             layer_sizes (list): [5,3]
+        
+        discretize_output (int, optional): If discret = n, then output will be only numbers between 0 and n-1. discret = 0 means no discretization =>. Defaults to 1.
 
         Returns:
             Network: Layer(10-->5) Layer(5-->3) Layer(3-->2)
         """
-        network = Network(input_size,output_size,discretize)
+        network = cls(input_size,output_size,discretize)
         in_size = input_size
         
         for size in layer_sizes:
@@ -272,129 +224,89 @@ class Network:
         network.compile()
         return network
     
-    @staticmethod
-    def zeros(input_size:int,output_size:int,layer_sizes:list,discretize:int=1):
+    @classmethod
+    def zeros(cls:type,input_size:int,output_size:int,layer_sizes:list,discretize:int=1):
         """creates network with given structure, filled with zeros
 
         Args for exemple:
             input_size (int): 10
             output_size (int): 2
             layer_sizes (list): [5,3]
+        
+        discretize_output (int, optional): If discret = n, then output will be only numbers between 0 and n-1. discret = 0 means no discretization =>. Defaults to 1.
 
         Returns:
             Network: Layer(10-->5) Layer(5-->3) Layer(3-->2)
         """
-        return Network.values(0,input_size,output_size,layer_sizes,discretize)
+        return cls.values(0,input_size,output_size,layer_sizes,discretize)
     
-class Population:
-    
-    def __init__(self,input_size:int, output_size:int, layer_structure:list=[],discretize:int=1,evolution_step:float=0.01,population_size:int=100):
-        """
-        Args:
-            input_size (int): see Network
-            output_size (int):see Network
-            layer_structure (list, optional): see Network. Defaults to [].
-            descretize (int, optional): see Network. Defaults to 1.
-            evolution_step (float, optional): mutation size for each generation. Defaults to 0.01.
-            population_size (int, optional): number of networks in the population. Defaults to 100.
-        """
-        self.individuals = [[Network.zeros(input_size,output_size,layer_structure,discretize),0] for i in range(population_size)]
-        self.step = evolution_step
-    
-    def reward(self,individual:int,reward:float)->None:
-        """increase score
 
-        Args:
-            individual (int): _description_
-            reward (float): _description_
-        """
-        self.individuals[individual][1]+=reward
-    
-    def sort(self)->None:
-        self.individuals.sort(key = lambda x:-x[1])
-    
-    def filter(self,best_pourcentage:float=0.10,target="")->None:
-        """keep best_pourcentage best and fill the rest with children of the bests
-
-        Args:
-            best_pourcentage (float, optional): what percentage of the population shall we keep. Defaults to 0.10.
-            target (str, optional): passed to split. See Network.split documentation. Defaults to "".
-        """
-        self.sort()
-        to_keep = max(1,min(len(self.individuals),int(best_pourcentage*len(self.individuals))))
-        new_pop = [[self.individuals[i][0],0] for i in range(to_keep)]
-        for i in range(len(self.individuals)-to_keep):
-            to_clone:Network = self.individuals[i%to_keep][0]
-            new_pop.append([to_clone.split(self.step,target),0])
-        self.individuals = new_pop
-    
-    def avg_score(self)->float:
-        return sum([score for _,score in self.individuals])/len(self.individuals)
-    
-    def network(self,index:int)->Network:
-        return self.individuals[index][0]
-    
-    def score(self,index:int)->float:
-        return self.individuals[index][1]
-        
-
-def demo(input_size):
-    
-    def target(input:list)->bool:
-        return int(sum(input)/input_size>=0.5)
-    
-    def rate(network:Network):
-        score=0
-        for _ in range(100):
-            input = [np.random.randint(0,2) for _ in range(input_size)]
-            if (target(input)==network(input)):
-                score+=1
-        return score/100
-    
-    def run():
-        population = Population(input_size,1,evolution_step=0.005,discretize=1)
-        
-        for i in ProgressIterator(range(20)):
-                
-            for j in range(len(population.individuals)):
-                population.reward(j,rate(population.network(j)))
-            
-                
-            if i==19:
-                print(f"Average score of the population : {population.avg_score():.2f}%")
-                
-            population.filter(0.10)
-        return population
-    
-    population = run()
-    
-    for i in range(len(population.individuals)):
-        population.reward(i,rate(population.network(i)))
-    population.sort()
-    
-    Memory("network").save(population.individuals[0][0],f"model_for_{input_size}")
     
 
 if __name__=="__main__":
     
-    MODEL_SIZE = 10
-
-    demo(MODEL_SIZE) #some models are currently loaded in memory !
+    from shadok.training import Trainable,Population
+    from shadok.progress_bar import ProgressIterator
+    from shadok.style import Style
     
-    model = Memory("network").load(f"model_for_{MODEL_SIZE}")
+    INPUT_SIZE=7
     
-    def target(input:list)->bool:
-        return int(sum(input)/MODEL_SIZE>=0.5)
+    class tNetwork(Trainable,Network):
+        
+        def __init__(self, input_size: int, output_size: int, discretize_output: int = 1):
+            super().__init__(input_size, output_size, discretize_output)
+        
+        def apply_mutations(self) -> None:
+            mutation = 0.01
+            for layer in self.get_layers():
+                layer["matrix"]+=(np.random.rand(*layer["matrix"].shape)-0.5)*mutation*2
+                layer["bias"]+=(np.random.rand(*layer["bias"].shape)-0.5)*mutation*2
+        
+        @classmethod
+        def load(cls:type):
+            cls.deactivate_load()
+            out = tNetwork.zeros(INPUT_SIZE,1,[5],1)
+            cls.activate_load()
+            return out
     
-    inputs = [[np.random.randint(2) for _ in range(MODEL_SIZE)] for _ in range(10)]
     
-    for input in inputs:
-        fails = (target(input)!=model(input))
-        if fails:
-            color = "red"
-        else:
-            color = "green"
-        print(f"Network response to input : {input} --> {Style(text=color)(model(input))}")
+    def random_input():
+        return [np.random.randint(0,2) for _ in range(INPUT_SIZE)]
+    
+    def right_answer(input)->int:
+        return int(sum(input)/INPUT_SIZE>=0.5)
+    
+    population = Population(tNetwork)
+    for i in ProgressIterator(range(100)):
+        
+        network:tNetwork
+        for network in population.citizens:
+            for i in range(20):
+                input = random_input()
+                if network(input)==right_answer(input):
+                    network.reward()
+                    
+        population.sort() 
+        population.filter(0.25)
+    population.get(0).save()
+    population.save()
+    
+    champion = tNetwork()
+    accuracy = 0
+    for i in range(100):
+        input = random_input()
+        net_res = champion(input)
+        rig_res = right_answer(input)
+        if net_res==rig_res:
+            accuracy+=1
+        if i%10==0:
+            color = "green" if net_res == rig_res else "red"
+            print("Input :",input,"-->",Style(text=color)(champion(input)))
+    print(f"Accuracy of the model : {accuracy/100:.0%}")
+    
+    
+        
+    
     
     
     

@@ -107,6 +107,15 @@ def CLEAR():
     """clears the console with os.system('cls')"""
     os.system('cls')
 
+def ASSERT(condition:bool):
+  """evaluates condition (true or false) and prints OK or FAIL
+
+  """
+  if condition:
+    OK()
+  else:
+    FAIL()
+
 if __name__=="__main__":
     OK()
     FAIL(end="")
