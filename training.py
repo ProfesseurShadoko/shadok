@@ -1,6 +1,7 @@
 from copy import deepcopy #recursive copy of an object, everything is copied
+from functools import wraps
 
-from shadok.memory import Loadable
+from shadok.memory import Loadable,autosave
 from shadok.abstract import IncompleteClassDefinition
 
 
@@ -15,7 +16,7 @@ class Trainable(Loadable):
     memory_path:str="memory/champions"
         
     def __str__(self) -> str:
-        return f"{type(self).__name__} object : generation={self.get_generation()}, {self.get_score()}"
+        return f"{type(self).__name__} object : generation={self.get_generation()}, score={self.get_score()}"
     
     def copy(self):
         """deepcopy (recursive copy of everthing) of the object. 
@@ -75,6 +76,9 @@ class Population(Loadable):
         
         for _ in range(self.size):
             self.citizens.append(self.cls.load())
+    
+    def __str__(self)->str:
+        return f"<{type(self).__name__} of {self.size} objects of type {self.cls.__name__}>"
 
     def avg_score(self)->float:
         return sum([citizen.get_score() for citizen in self.citizens])/len(self.citizens)
@@ -105,5 +109,9 @@ class Population(Loadable):
         
         self.citizens = new_pop
 
+    @autosave
+    def train(self,generation:int=100):
+        """train your population (using reward / filter). Use wrapper @autosave in order to save progression at the end or on keyboardinterupt"""
+        raise IncompleteClassDefinition("train",type(self))
 
 

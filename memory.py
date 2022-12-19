@@ -1,8 +1,11 @@
 import os
+import sys
 import shutil
 import pickle
 from functools import wraps
-from abstract import IncompleteClassDefinition
+
+from shadok.abstract import IncompleteClassDefinition
+from shadok.style import Style
 
 class Memory:
     
@@ -115,6 +118,23 @@ class Loadable(metaclass=LoadableMeta):
     def reset_memory(cls:type)->None:
         """forget the last instance created. Next instance will be brand new."""
         Memory(cls.memory_path).reset()
+
+def autosave(func):
+    """Saves self (of type inheriting from loadable) at the end of execution. if a KeyboardInterrupt happens during execution, self will be saved and system will be shut down."""
+    @wraps(func)
+    def wrapper(self,*args,**kwargs):
+        stdout = sys.stdout
+        try:
+            out=func(self,*args,**kwargs)
+        except KeyboardInterrupt:
+            sys.stdout=stdout
+            print("\n")
+            self.save()
+            print(Style(text="yellow")(f"KeybordInterrupt --> object successfully saved : {self}"))
+            sys.exit(0)
+        self.save()
+        return out
+    return wrapper
 
 if __name__=="__main__":
     

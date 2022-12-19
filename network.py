@@ -248,6 +248,7 @@ if __name__=="__main__":
     from shadok.training import Trainable,Population
     from shadok.progress_bar import ProgressIterator
     from shadok.style import Style
+    from shadok.memory import autosave
     
     INPUT_SIZE=7
     
@@ -269,29 +270,30 @@ if __name__=="__main__":
             cls.activate_load()
             return out
     
-    
+    class tNetworkPop(Population):
+        def __init__(self):
+            super().__init__(tNetwork)
+        @autosave
+        def train(self,generations:int=100)->None:
+            for _ in ProgressIterator(range(generations)):
+                for network in population.citizens:
+                    for _ in range(20):
+                        input = random_input()
+                        if network(input)==right_answer(input):
+                            network.reward()
+                population.filter(0.25)
+            population.get(0).save() 
+   
     def random_input():
         return [np.random.randint(0,2) for _ in range(INPUT_SIZE)]
     
     def right_answer(input)->int:
         return int(sum(input)/INPUT_SIZE>=0.5)
     
-    population = Population(tNetwork)
-    for i in ProgressIterator(range(100)):
-        
-        network:tNetwork
-        for network in population.citizens:
-            for i in range(20):
-                input = random_input()
-                if network(input)==right_answer(input):
-                    network.reward()
-                    
-        population.sort() 
-        population.filter(0.25)
-    population.get(0).save()
-    population.save()
+    population = tNetworkPop()
+    population.train()
+    champion = tNetwork() #saved in train
     
-    champion = tNetwork()
     accuracy = 0
     for i in range(100):
         input = random_input()
