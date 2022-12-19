@@ -28,7 +28,7 @@ class Trainable(Loadable):
             self.score = 0
         self.score+=points
     
-    def get_score(self)->float:
+    def get_score_rwd(self)->float:
         if not hasattr(self,"score"):
             self.score=0
         return self.score
@@ -62,12 +62,31 @@ class Trainable(Loadable):
         return out
 
 class Population(Loadable):
-    """Population is a set of Trainable objects that evolve from generation to generation
+    """Population is a set of Trainable objects that evolve from generation to generation.
+    On initialisation, __init__ takes in input the class of the object you want to train (class must inherit from Trainable).
+    You also give the size of the population.
+    Population inherist from Loadable, so the training will restart from where it lasts stopped. Run Population.reset_memory() to restart.
+    
+    Usefull functions are the fllowing :
+        - population.reward(citizen:int,points:float)
+        - population.get(citizen:int) -> object of trained_class
+        - population.filter(percent:float) => only keeps elements of the population that have been rewarded the most
+    
+    You must implement the following function :
+        @autosave
+        def train(self,generations,...):
+            <repeat for each generation>
+                <loop over the citizens>
+                    <test citizen and reward if success>
+                <filter population>
+    Population will automatically be saved at the end of execution.
+    
+    If you want to train different population, change the memory_path.
     """
+    
     memory_path="memory/populations"
     
     def __init__(self,cls:type,size:int=100):
-        print("no reload")
         if size==0:
             raise(ZeroDivisionError())
         self.citizens:list=[]
@@ -81,7 +100,7 @@ class Population(Loadable):
         return f"<{type(self).__name__} of {self.size} objects of type {self.cls.__name__}>"
 
     def avg_score(self)->float:
-        return sum([citizen.get_score() for citizen in self.citizens])/len(self.citizens)
+        return sum([citizen.get_score_rwd() for citizen in self.citizens])/len(self.citizens)
     
     def reward(self,citizen:int,points:float=1)->None:
         self.citizens[citizen].reward(points)
@@ -91,7 +110,7 @@ class Population(Loadable):
     
     def sort(self)->None:
         """sorts population by decreasing score (best score = best models = first)"""
-        self.citizens.sort(key=lambda x:-x.get_score())
+        self.citizens.sort(key=lambda x:-x.get_score_rwd())
     
     def filter(self,percent:float=0.1):
         """if percent = 0.1, the ten best models remain and the rest of the population is filled with their children.
@@ -106,7 +125,6 @@ class Population(Loadable):
         
         for i in range(len(self.citizens)-to_keep):
             new_pop.append(self.get(i%to_keep).split())
-        
         self.citizens = new_pop
 
     @autosave

@@ -97,8 +97,7 @@ class Loadable(metaclass=LoadableMeta):
         f"{type(self).memory_path}/{type(self).__name__}.shadok
         Instance will autamatically be reloaded on next creation of the instance"
         """
-        memory = Memory(f"{type(self).memory_path}")
-        memory.save(self,f"{type(self).__name__}")
+        Memory(f"{type(self).memory_path}").save(self,f"{type(self).__name__}")
     
     def is_reloaded(self)->bool:
         """checks if current instance has been reloaded from existing instance in memory."""
