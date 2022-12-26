@@ -145,7 +145,7 @@ Numbers : the rules are the following. You are given a set of 6 numbers (integer
 ```python
 from shadok.dcdl import ChiffreSolver
 
-ChiffreSolver([1,25,75,4,3,6],985).run()
+ChiffreSolver([1,25,75,4,3,6],985).run() #returns (75-1+6)*4*3+25=985
 ```
 ***
 
