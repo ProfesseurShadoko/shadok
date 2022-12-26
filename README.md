@@ -138,7 +138,7 @@ Letters : the rules are the following. You are given a set of 10 letters, you mu
 from shadok.dcdl import LetterSolver
 from shadok.dictionnary import Dcdl #official dictionnary of the games (some words are not allowed, conjugated verbs for exemple)
 
-LetterSolver("ceolclcnic",Dcdl()).run()
+LetterSolver("ceolclcnic",Dcdl()).run() #returns 'coccinelle'
 ```
 
 Numbers : the rules are the following. You are given a set of 6 numbers (integers from 1 to 10 plus 25,50,75 and 100) and using + - * / to combine the numbers you must find some target number
@@ -164,7 +164,7 @@ An easy way to save and load variable in python, using the pickle package.
 from shadok.memory import Memory
 
 class Pet:
-  def __init__(self,nane:str):
+  def __init__(self,name:str):
     self.name = name
 
 dog = Pet("Snoopy")
@@ -174,19 +174,23 @@ dog = Memory().load("dog")
 print(dog.name)
 ```
 
+It is also possible to create a class that, when an instance is constructed, first checks if an instance already exists in the memory (if so, it will be loaded, else,  the usual __new__ and __init__ function will be called.
+```python
+from shadok.memory import Loadable
+
+class Dog(Loadable):
+  def __init__(self,name:str):
+    self.name = name
+
+dog = Dog("Snoopy")
+dog.save()
+
+dog = Dog()
+print(dog.name) #prints 'Snoopy'
+```
 ***
 
-***Neural Network and Genetic Algorithm***
 
-Implementation of a Neural Network (set of layers (weights + bias + sigmoid function)) that has a 'split' function that allows him to have a child with a genetic mutation. Implementation of a Population that evolves tep by step (by only keeping the individuals that have been rewarded the most).
-
-```python
-from shadok.network import Layer, Network, Population
-import numpy as np
-
-population = Population(input_size=10,output_size=1,evolution_step=0.005,layer_structure=[5,3],population_size=100,discretize=1)
-
-```
 
 ***
 
