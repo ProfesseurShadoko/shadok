@@ -1,9 +1,8 @@
 
 # Shadok
 
-This is my personal python package, but it contains some usefull
-tools like wrappers, dictionnaries (in French), ProgressBar, some
-ProblemSolvers, etc.
+This is my personal python package, that I created mostly for learning purposes, but it contains some usefull
+tools like wrappers, dictionnaries (in French), a class that helps you print a progress bar, tools for memorizing variables, solvers for the french game "Des Chiffres et des Lettres" and Scrabble...
 
 
 
